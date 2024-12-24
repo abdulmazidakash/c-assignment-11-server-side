@@ -69,6 +69,28 @@ async function run() {
 		res.send(result);
 	})
 
+	//get a single job data by id from db update
+	app.get('/artifact/:id', async(req, res)=>{
+		const id = req.params.id;
+		const query = { _id: new ObjectId(id)};
+		const result = await artifactCollection.findOne(query);
+		res.send(result);
+	})
+
+	//update data from db specific user
+	app.put('/update-artifact/:id', async(req, res) =>{
+		const id = req.params.id;
+		const artifactData = req.body;
+		const updated = {
+			$set: artifactData,
+		}
+		const query = { _id: new ObjectId(id)};
+		const options = { upsert: true};
+		const result = await artifactCollection.updateOne(query, updated, options);
+
+		console.log(result);
+		res.send(result);
+	})
 
 	  
 
