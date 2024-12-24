@@ -16,10 +16,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-//db_user=artifact_Atlas
-//db_pass=FqWxwdmcbRLPWBVv
-
-
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.j0hxo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -53,6 +49,14 @@ async function run() {
 	//get all artifacts data from db
 	app.get('/artifacts', async(req, res)=>{
 		const result = await artifactCollection.find().toArray();
+		res.send(result);
+	})
+
+	//get all artifacts posted by a specific user
+	app.get('/artifacts/:email', async(req, res)=>{
+		const email = req.params.email;
+		const query = { adderEmail: email};
+		const result = await artifactCollection.find(query).toArray();
 		res.send(result);
 	})
 
