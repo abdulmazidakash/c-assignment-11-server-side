@@ -6,8 +6,14 @@ const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
 
+const corsOptions = {
+	origin: ['http://localhost:5173', 'http://localhost:5174'],
+	credentials: true,
+	optionalSuccessStatus: 200,
+}
+
 //middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 //db_user=artifact_Atlas
@@ -16,7 +22,7 @@ app.use(express.json());
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.j0hxo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-console.log(uri);
+
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -44,7 +50,11 @@ async function run() {
 		res.send(result)
 	})
 
-
+	//get all artifacts data from db
+	app.get('/artifacts', async(req, res)=>{
+		const result = await artifactCollection.find().toArray();
+		res.send(result);
+	})
 
 
 
