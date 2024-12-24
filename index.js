@@ -3,7 +3,7 @@ const cors = require('cors');
 const app = express();
 require('dotenv').config()
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 
 const corsOptions = {
@@ -60,6 +60,17 @@ async function run() {
 		res.send(result);
 	})
 
+
+	//delete a artifact from db
+	app.delete('/artifact/:id', async(req, res)=>{
+		const id = req.params.id;
+		const query = {_id: new ObjectId(id)};
+		const result = await artifactCollection.deleteOne(query);
+		res.send(result);
+	})
+
+
+	  
 
 
 
