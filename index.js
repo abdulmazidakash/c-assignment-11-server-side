@@ -32,6 +32,20 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+	const db = client.db('artifact-db')
+	const artifactCollection = db.collection('artifacts')
+
+	//save a add artifact data in db
+	app.post('/add-artifact', async(req, res) =>{
+		const artifactData = req.body
+		const result = await artifactCollection.insertOne(artifactData)
+
+		// console.log(result)
+		res.send(result)
+	})
+
+
+
 
 
 
