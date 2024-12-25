@@ -54,11 +54,19 @@ async function run() {
 		res.send(result)
 	})
 
-	//get all artifacts data from db
+	// get all artifacts data from db
 	app.get('/artifacts', async(req, res)=>{
-		const result = await artifactCollection.find().toArray();
+		const search = req.query.search;
+		let query = {
+			name: {
+				$regex: search,
+				$options: 'i',
+			}
+		}
+		const result = await artifactCollection.find(query).toArray();
 		res.send(result);
 	})
+	
 
 	//get all artifacts posted by a specific user
 	app.get('/artifacts/:email', async(req, res)=>{
