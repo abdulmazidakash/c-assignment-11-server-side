@@ -5,6 +5,7 @@ require('dotenv').config()
 const jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const cookieParser = require('cookie-parser');
 
 
 const corsOptions = {
@@ -16,6 +17,7 @@ const corsOptions = {
 //middleware
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.j0hxo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -29,6 +31,23 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
+
+//verify token
+const verifyToken = (req, res, next) =>{
+	const token = req.cookies?.token;
+	// console.log(token);
+	if(!token) return res.status(401).send({message: 'unauthorized access'})
+		jwt.verify(token, process.env.SECRET_KEY, (err, decoded) =>{
+			if(err){
+				return res.status(401).send({message: 'unauthorized access'})
+			}
+			req.user = decoded
+	})
+
+	
+
+	next();
+}
 
 async function run() {
   try {
@@ -76,7 +95,7 @@ async function run() {
 	  
 
 	//save a add artifact data in db
-	app.post('/add-artifact', async(req, res) =>{
+	app.post('/add-artifact', verifyToken, async(req, res) =>{
 		const artifactData = req.body
 		const result = await artifactCollection.insertOne(artifactData)
 
@@ -99,8 +118,16 @@ async function run() {
 	
 
 	//get all artifacts posted by a specific user
-	app.get('/artifacts/:email', async(req, res)=>{
+	app.get('/artifacts/:email', verifyToken, async(req, res)=>{
+
 		const email = req.params.email;
+		const decodedEmail = req.user?.email;
+
+		console.log('email from token--->', decodedEmail);
+		console.log('email from params--->', email);
+
+		if(decodedEmail !== email) 
+			return res.status.send({message: 'unauthorize access'})
 		const query = { adderEmail: email};
 		const result = await artifactCollection.find(query).toArray();
 		res.send(result);
@@ -108,7 +135,7 @@ async function run() {
 
 
 	//delete a artifact from db
-	app.delete('/artifact/:id', async(req, res)=>{
+	app.delete('/artifact/:id', verifyToken, async(req, res)=>{
 		const id = req.params.id;
 		const query = {_id: new ObjectId(id)};
 		const result = await artifactCollection.deleteOne(query);
@@ -116,7 +143,7 @@ async function run() {
 	})
 
 	//get a single job data by id from db update
-	app.get('/artifact/:id', async(req, res)=>{
+	app.get('/artifact/:id', verifyToken, async(req, res)=>{
 		const id = req.params.id;
 		const query = { _id: new ObjectId(id)};
 		const result = await artifactCollection.findOne(query);
@@ -124,7 +151,7 @@ async function run() {
 	})
 
 	//update data from db specific user
-	app.put('/update-artifact/:id', async(req, res) =>{
+	app.put('/update-artifact/:id', verifyToken, async(req, res) =>{
 		const id = req.params.id;
 		const artifactData = req.body;
 		const updated = {
@@ -166,8 +193,15 @@ async function run() {
 	})
 
 	//get all like for a specific user
-	 app.get('/liked/:email', async(req, res)=>{
+	 app.get('/liked/:email', verifyToken, async(req, res)=>{
 		const email = req.params.email;
+		const decodedEmail = req.user?.email;
+
+		// console.log('email from token--->', decodedEmail);
+		// console.log('email from params--->', email);
+
+		if(decodedEmail !== email) 
+			return res.status.send({message: 'unauthorize access'})
 		const query = { email };
 		const result = await likedCollection.find(query).toArray();
 		res.send(result);
