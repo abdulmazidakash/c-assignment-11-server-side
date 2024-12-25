@@ -38,7 +38,7 @@ async function run() {
 	const artifactCollection = db.collection('artifacts');
 	const likedCollection = db.collection('liked');
 
-	// Fetch Latest 6 artifact Cards
+	// Fetch featured 6 artifact Cards
     app.get("/featured-artifact", async (req, res) => {
 		const mostLike = await artifactCollection.find().sort({ like_count: -1 }).limit(6).toArray();
 		res.json(mostLike);
