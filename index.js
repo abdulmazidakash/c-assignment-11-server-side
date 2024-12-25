@@ -57,6 +57,17 @@ async function run() {
 		}).send({ success: true})
 	})
 
+	//logout || clear cookie from browser
+	app.get('/logout', async(req, res)=>{
+		res
+		.clearCookie('token', {
+			maxAge: 0,
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+		})
+		.send({success: true})
+	})
+
 	// Fetch featured 6 artifact Cards
     app.get("/featured-artifact", async (req, res) => {
 		const mostLike = await artifactCollection.find().sort({ like_count: -1 }).limit(6).toArray();
