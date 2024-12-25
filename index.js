@@ -167,7 +167,7 @@ async function run() {
 
 	  
 	//save a liked data in db
-	app.post('/add-like', async(req, res)=>{
+	app.post('/add-like', verifyToken, async(req, res)=>{
 		// 1.save data in liked collection
 		const likedData = req.body;
 
