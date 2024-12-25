@@ -34,8 +34,16 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-	const db = client.db('artifact-db')
-	const artifactCollection = db.collection('artifacts')
+	const db = client.db('artifact-db');
+	const artifactCollection = db.collection('artifacts');
+	const likedCollection = db.collection('liked');
+
+	// Fetch Latest 6 artifact Cards
+    app.get("/featured-artifact", async (req, res) => {
+		const mostLike = await artifactCollection.find().sort({ like_count: -1 }).limit(6).toArray();
+		res.json(mostLike);
+	  });
+	  
 
 	//save a add artifact data in db
 	app.post('/add-artifact', async(req, res) =>{
@@ -93,7 +101,31 @@ async function run() {
 	})
 
 	  
+	//save a liked data in db
+	app.post('/add-like', async(req, res)=>{
+		// 1.save data in liked collection
+		const likedData = req.body;
 
+		//if a user placed a like already in this artifact
+		const query = { email: likedData.email, artifactId: likedData.artifactId};
+		const alreadyExist = await likedCollection.findOne(query);
+		console.log('if already exist---->', alreadyExist);
+
+		if(alreadyExist)
+			return res
+			.status(400)
+			.send('you already placed a like on this artifact')
+		const result = await likedCollection.insertOne(likedData);
+
+		//2. increase like count in artifact collection
+		const filter = { _id: new ObjectId(likedData.artifactId)};
+		const update = {
+			$inc: {like_count: 1},
+		}
+		const updateLikeCount = await artifactCollection.updateOne(filter, update)
+		console.log(result);
+		res.send(result);
+	})
 
 
     // Send a ping to confirm a successful connection
