@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 require('dotenv').config()
+const jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
@@ -37,6 +38,24 @@ async function run() {
 	const db = client.db('artifact-db');
 	const artifactCollection = db.collection('artifacts');
 	const likedCollection = db.collection('liked');
+
+	//generate jwt
+	app.post('/jwt', async(req, res) =>{
+		const email = req.body;
+
+		//create token
+		const token = jwt.sign(email, process.env.SECRET_KEY, {
+			expiresIn: '365d',
+		})
+		console.log(token);
+		// res.send(token);
+		res.cookie('token', token, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+
+		}).send({ success: true})
+	})
 
 	// Fetch featured 6 artifact Cards
     app.get("/featured-artifact", async (req, res) => {
