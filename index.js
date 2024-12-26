@@ -52,7 +52,7 @@ const verifyToken = (req, res, next) =>{
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
+    await client.connect();
 
 	const db = client.db('artifact-db');
 	const artifactCollection = db.collection('artifacts');
@@ -104,17 +104,7 @@ async function run() {
 	})
 
 	// get all artifacts data from db
-	// app.get('/artifacts', async(req, res)=>{
-	// 	const search = req.query.search;
-	// 	let query = {
-	// 		name: {
-	// 			$regex: search,
-	// 			$options: 'i',
-	// 		}
-	// 	}
-	// 	const result = await artifactCollection.find(query).toArray();
-	// 	res.send(result);
-	// })
+
 
 	app.get('/artifacts', async (req, res) => {
 		const search = req.query.search || ''; // Default to an empty string if not provided
@@ -123,7 +113,7 @@ async function run() {
 		// Only add the $regex filter if search is a non-empty string
 		if (search.trim()) {
 		  query = {
-			title: {
+			name: {
 			  $regex: search.trim(), // Ensure it's a valid string
 			  $options: 'i', // Case-insensitive
 			},
