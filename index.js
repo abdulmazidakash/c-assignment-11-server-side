@@ -9,7 +9,7 @@ const cookieParser = require('cookie-parser');
 
 
 const corsOptions = {
-	origin: ['http://localhost:5173', 'http://localhost:5174', 'https://assignment-11-artifact-atlas.netlify.app'],
+	origin: ['http://localhost:5173', 'http://localhost:5174', 'https://assignment-11-artifact-atlas.netlify.app', 'https://assignment-11-9dd66.firebaseapp.com', 'https://assignment-11-9dd66.web.app'],
 	credentials: true,
 	optionalSuccessStatus: 200,
 }
@@ -104,17 +104,41 @@ async function run() {
 	})
 
 	// get all artifacts data from db
-	app.get('/artifacts', async(req, res)=>{
-		const search = req.query.search;
-		let query = {
-			name: {
-				$regex: search,
-				$options: 'i',
-			}
+	// app.get('/artifacts', async(req, res)=>{
+	// 	const search = req.query.search;
+	// 	let query = {
+	// 		name: {
+	// 			$regex: search,
+	// 			$options: 'i',
+	// 		}
+	// 	}
+	// 	const result = await artifactCollection.find(query).toArray();
+	// 	res.send(result);
+	// })
+
+	app.get('/artifacts', async (req, res) => {
+		const search = req.query.search || ''; // Default to an empty string if not provided
+		let query = {};
+	  
+		// Only add the $regex filter if search is a non-empty string
+		if (search.trim()) {
+		  query = {
+			title: {
+			  $regex: search.trim(), // Ensure it's a valid string
+			  $options: 'i', // Case-insensitive
+			},
+		  };
 		}
-		const result = await artifactCollection.find(query).toArray();
-		res.send(result);
-	})
+	  
+		try {
+		  const result = await artifactCollection.find(query).toArray();
+		  res.send(result);
+		} catch (error) {
+		  console.error('Error fetching artifacts:', error);
+		  res.status(500).send({ message: 'Internal Server Error' });
+		}
+	  });
+	  
 	
 
 	//get all artifacts posted by a specific user
