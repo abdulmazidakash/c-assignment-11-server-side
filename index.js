@@ -9,7 +9,7 @@ const cookieParser = require('cookie-parser');
 
 
 const corsOptions = {
-	origin: ['http://localhost:5173', 'http://localhost:5174'],
+	origin: ['http://localhost:5173', 'http://localhost:5174', 'https://assignment-11-artifact-atlas.netlify.app'],
 	credentials: true,
 	optionalSuccessStatus: 200,
 }
@@ -52,7 +52,7 @@ const verifyToken = (req, res, next) =>{
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
 	const db = client.db('artifact-db');
 	const artifactCollection = db.collection('artifacts');
@@ -66,7 +66,7 @@ async function run() {
 		const token = jwt.sign(email, process.env.SECRET_KEY, {
 			expiresIn: '365d',
 		})
-		console.log(token);
+		// console.log(token);
 		// res.send(token);
 		res.cookie('token', token, {
 			httpOnly: true,
@@ -209,8 +209,8 @@ async function run() {
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
