@@ -35,7 +35,7 @@ const client = new MongoClient(uri, {
 //verify token
 const verifyToken = (req, res, next) =>{
 	const token = req.cookies?.token;
-	// console.log(token);
+
 	if(!token) return res.status(401).send({message: 'unauthorized access'})
 		jwt.verify(token, process.env.SECRET_KEY, (err, decoded) =>{
 			if(err){
@@ -66,7 +66,7 @@ async function run() {
 		const token = jwt.sign(email, process.env.SECRET_KEY, {
 			expiresIn: '365d',
 		})
-		// console.log(token);
+
 		// res.send(token);
 		res.cookie('token', token, {
 			httpOnly: true,
@@ -99,7 +99,7 @@ async function run() {
 		const artifactData = req.body
 		const result = await artifactCollection.insertOne(artifactData)
 
-		// console.log(result)
+
 		res.send(result)
 	})
 
@@ -210,9 +210,6 @@ async function run() {
 	 app.get('/liked/:email', verifyToken, async(req, res)=>{
 		const email = req.params.email;
 		const decodedEmail = req.user?.email;
-
-		// console.log('email from token--->', decodedEmail);
-		// console.log('email from params--->', email);
 
 		if(decodedEmail !== email) 
 			return res.status.send({message: 'unauthorize access'})
