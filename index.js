@@ -7,7 +7,6 @@ const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cookieParser = require('cookie-parser');
 
-
 const corsOptions = {
 	origin: ['http://localhost:5173', 'http://localhost:5174', 'https://assignment-11-artifact-atlas.netlify.app', 'https://assignment-11-9dd66.firebaseapp.com', 'https://assignment-11-9dd66.web.app'],
 	credentials: true,
@@ -19,9 +18,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.j0hxo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -43,9 +40,6 @@ const verifyToken = (req, res, next) =>{
 			}
 			req.user = decoded
 	})
-
-	
-
 	next();
 }
 
@@ -97,15 +91,11 @@ async function run() {
 	//save a add artifact data in db
 	app.post('/add-artifact', verifyToken, async(req, res) =>{
 		const artifactData = req.body
-		const result = await artifactCollection.insertOne(artifactData)
-
-
+		const result = await artifactCollection.insertOne(artifactData);
 		res.send(result)
 	})
 
 	// get all artifacts data from db
-
-
 	app.get('/artifacts', async (req, res) => {
 		const search = req.query.search || ''; // Default to an empty string if not provided
 		let query = {};
@@ -129,8 +119,6 @@ async function run() {
 		}
 	  });
 	  
-	
-
 	//get all artifacts posted by a specific user
 	app.get('/artifacts/:email', verifyToken, async(req, res)=>{
 
@@ -229,14 +217,10 @@ async function run() {
 }
 run().catch(console.dir);
 
-
-
 //
 app.get('/', (req, res)=>{
 	res.send('artifacts atlas server is running')
 })
-
-
 //
 app.listen(port, ()=>{
 	console.log(`job is running for Port: ${port}`);
